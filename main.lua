@@ -11,15 +11,31 @@ conf.width = 128
 conf.height = 128
 
 function love.load()
+  love.keyboard.setKeyRepeat(true)
   -- Initialize controls
   controls = {{
-    key="m",
-    description="new map",
-    control=function() terrain.createMap(conf.width, conf.height) end
-  }, {
+  -- TODO: supply seed
+  --  key="m",
+  --  description="regenerate map",
+  --  control=function() terrain.createMap(conf.width, conf.height) end
+  --}, {
     key="x",
     description="show debug text",
     control=function() debugText = not debugText end
+  }, {
+    key="k",
+    description="decrease scale",
+    control=function()
+      terrain.scale = terrain.scale - .5
+      terrain.createMap(conf.width, conf.height)
+    end
+  }, {
+    key="l",
+    description="increase scale",
+    control=function()
+      terrain.scale = terrain.scale + .5
+      terrain.createMap(conf.width, conf.height)
+    end
   }, {
     key="o",
     description="decrease age",
@@ -39,6 +55,8 @@ function love.load()
     description="quit",
     control=function() love.event.push("quit") end
   }}
+  -- Generate an initial map
+  terrain.createMap(conf.width, conf.height)
 end
 
 function love.update(dt)
@@ -50,14 +68,13 @@ function love.update(dt)
       ('fps %s'):format(love.timer.getFPS()),
     }
     statsStr = table.concat(stats, '\n')
-    -- TODO: do the control descriptions need to be updated every frame?
     -- Regenerate the controls list to reflect current config values
     local controlsList = {}
     for i,v in ipairs(controls) do
       local d = v.description
-      --if v.key == "x" then
-      --  d = ("%s [%s]":format(d, tostring(debugText))
-      --end
+      if v.key == "k" then
+        d = ("%s [%s]"):format(d, terrain.scale)
+      end
       table.insert(controlsList, ("%s %s"):format(v.key, d))
     end
     controlsStr = table.concat(controlsList, '\n')

@@ -3,6 +3,7 @@
 local terrain = {}
 terrain.map = {width=0, height=0}
 terrain.age = 0
+terrain.scale = 8
 
 function terrain.createMap(width, height, tileset)
   local age = terrain.age
@@ -18,9 +19,8 @@ function terrain.createMap(width, height, tileset)
   -- Find the region in noise-space from which to sample
   -- Generate sample points by dividing a bounding rectangle
   -- TODO: use a scale
-  local xscale = 8  -- How large an area in noise space to cover
-  local yscale = xscale / (width / height)    -- Don't squash the map
-  --TODO: rand
+  local xscale = terrain.scale  -- How large an area in noise space to cover
+  local yscale = xscale / (width / height)  -- Don't squash the map
   local origin = {math.random(256), math.random(256)}
   local nx, ny = origin[1], origin[2]
   local dx = xscale / width
@@ -53,7 +53,7 @@ end
 function terrain.draw()
   -- TODO: tile size
   -- TODO: center the map
-  local tilesize = 4
+  local tilesize = 8
   local map = terrain.map
   local xpos, ypos = 0, 0
   for y=1,map.height do
