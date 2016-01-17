@@ -6,7 +6,7 @@ terrain.age = 0
 terrain.width = 256
 terrain.height = 256
 terrain.scale = 2
-terrain.octaves = 4
+terrain.octaves = 1
 terrain.persistence = .5
 
 function terrain.createMap()
@@ -26,14 +26,13 @@ function terrain.createMap()
   --math.randomseed(os.time())
   math.randomseed(123)
 
-  -- The origin in noise space
-  local origin = {math.random(256), math.random(256)}
-
   for octave=1,terrain.octaves do
     -- Scale defines the size of the area in noise space from which to draw
     -- points.
     local xscale = terrain.scale * octave
     local yscale = xscale / (width / height)  -- Don't squash the map
+    -- The origin in noise space
+    local origin = {math.random(256), math.random(256)}
     local nx, ny = origin[1], origin[2]
     local dx = xscale / width
     local dy = yscale / height
@@ -57,7 +56,7 @@ end
 function terrain.draw()
   -- TODO: tile size
   -- TODO: center the map
-  local tilesize = 2
+  local tilesize = 4
   local map = terrain.map
   local xpos, ypos = 0, 0
   for y=1,terrain.height do

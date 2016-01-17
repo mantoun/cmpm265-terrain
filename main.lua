@@ -51,7 +51,7 @@ function love.load()
     key="n",
     description="octaves -",
     control=function()
-      terrain.octaves = math.max(terrain.octaves - 1, 0)
+      terrain.octaves = math.max(terrain.octaves - 1, 1)
       terrain.createMap()
     end
   }, {
@@ -104,7 +104,7 @@ function love.update(dt)
       elseif v.key == "," then
         d = ("%s [%s]"):format(d, terrain.persistence)
       end
-      table.insert(controlsList, ("%s %s"):format(v.key, d))
+      table.insert(controlsList, ("%s\t%s"):format(v.key, d))
     end
     controlsStr = table.concat(controlsList, '\n')
     debugStr = ("%s\n\n%s"):format(statsStr, controlsStr)
