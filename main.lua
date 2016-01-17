@@ -6,9 +6,6 @@ local debugStr = ""
 local debugText = true       -- Whether to draw the controls on the screen
 local debugInterval = 1/10   -- Time between updates
 local debugTimer = 0
-local conf = {}
-conf.width = 128
-conf.height = 128
 
 function love.load()
   love.keyboard.setKeyRepeat(true)
@@ -17,38 +14,66 @@ function love.load()
   -- TODO: supply seed
   --  key="m",
   --  description="regenerate map",
-  --  control=function() terrain.createMap(conf.width, conf.height) end
+  --  control=function() terrain.createMap() end
   --}, {
     key="x",
     description="show debug text",
     control=function() debugText = not debugText end
   }, {
     key="k",
-    description="decrease scale",
+    description="scale -",
     control=function()
       terrain.scale = terrain.scale - .5
-      terrain.createMap(conf.width, conf.height)
+      terrain.createMap()
     end
   }, {
     key="l",
-    description="increase scale",
+    description="scale +",
     control=function()
       terrain.scale = terrain.scale + .5
-      terrain.createMap(conf.width, conf.height)
+      terrain.createMap()
     end
   }, {
     key="o",
-    description="decrease age",
+    description="age -",
     control=function()
-      terrain.age = terrain.age - .2
-      terrain.createMap(conf.width, conf.height)
+      terrain.age = terrain.age - .1
+      terrain.createMap()
     end
   }, {
     key="p",
-    description="increase age",
+    description="age +",
     control=function()
-      terrain.age = terrain.age + .2
-      terrain.createMap(conf.width, conf.height)
+      terrain.age = terrain.age + .1
+      terrain.createMap()
+    end
+  }, {
+    key="n",
+    description="octaves -",
+    control=function()
+      terrain.octaves = math.max(terrain.octaves - 1, 0)
+      terrain.createMap()
+    end
+  }, {
+    key="m",
+    description="octaves +",
+    control=function()
+      terrain.octaves = terrain.octaves + 1
+      terrain.createMap()
+    end
+  }, {
+    key=",",
+    description="persistence -",
+    control=function()
+      terrain.persistence = math.max(terrain.persistence - .1, 0)
+      terrain.createMap()
+    end
+  }, {
+    key=".",
+    description="persistence +",
+    control=function()
+      terrain.persistence = terrain.persistence + .1
+      terrain.createMap()
     end
   }, {
     key="q",
@@ -56,7 +81,7 @@ function love.load()
     control=function() love.event.push("quit") end
   }}
   -- Generate an initial map
-  terrain.createMap(conf.width, conf.height)
+  terrain.createMap()
 end
 
 function love.update(dt)
@@ -74,6 +99,10 @@ function love.update(dt)
       local d = v.description
       if v.key == "k" then
         d = ("%s [%s]"):format(d, terrain.scale)
+      elseif v.key == "n" then
+        d = ("%s [%s]"):format(d, terrain.octaves)
+      elseif v.key == "," then
+        d = ("%s [%s]"):format(d, terrain.persistence)
       end
       table.insert(controlsList, ("%s %s"):format(v.key, d))
     end
