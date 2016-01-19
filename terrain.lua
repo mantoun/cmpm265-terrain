@@ -8,6 +8,10 @@ terrain.height = 256
 terrain.scale = 8
 terrain.octaves = 1
 terrain.persistence = .5
+terrain.origin = {math.random(512), math.random(512)}
+
+local canvas = love.graphics.newCanvas()
+
 
 -- TODO: move origin
 -- TODO: not very high contrast... is it hitting the full [0, 1]?
@@ -15,6 +19,7 @@ terrain.persistence = .5
 function terrain.createMap()
   local age = terrain.age
   local map = terrain.map
+  local origin = terrain.origin
   local width, height = terrain.width, terrain.height
   for y=1,height do
     map[y] = {}
@@ -25,11 +30,8 @@ function terrain.createMap()
   -- TODO: if no tileset just use color
   -- TODO: if tileset, check for {path="", size=16}
   -- TODO: use seed if provided
-  --math.randomseed(os.time())
-  math.randomseed(123)
-
-  -- The origin in noise space
-  local origin = {math.random(256), math.random(256)}
+  math.randomseed(os.time())
+  --math.randomseed(123)
 
   for octave=1,terrain.octaves do
     -- Scale defines the size of the area in noise space from which to draw
@@ -63,9 +65,13 @@ function terrain.createMap()
     end
   end
   print(min, max)
+  renderMap()
 end
 
-function terrain.draw()
+function renderMap()
+  canvas = love.graphics.newCanvas()
+  love.graphics.setCanvas(canvas)
+
   -- TODO: tile size
   -- TODO: center the map
   local tilesize = 2
@@ -83,6 +89,11 @@ function terrain.draw()
     end
     ypos = ypos + tilesize
   end
+  love.graphics.setCanvas()
+end
+
+function terrain.draw()
+  love.graphics.draw(canvas)
 end
 
 return terrain

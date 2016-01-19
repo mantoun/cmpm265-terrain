@@ -62,6 +62,20 @@ function love.load()
       terrain.createMap()
     end
   }, {
+    key="a",
+    description="origin x -",
+    control=function()
+      terrain.origin[1] = terrain.origin[1] - 1
+      terrain.createMap()
+    end
+  }, {
+    key="s",
+    description="origin x +",
+    control=function()
+      terrain.origin[1] = terrain.origin[1] + 1
+      terrain.createMap()
+    end
+  }, {
     key=",",
     description="persistence -",
     control=function()
