@@ -20,6 +20,14 @@ function love.load()
     description="show debug text",
     control=function() debugText = not debugText end
   }, {
+    key="z",
+    description="regenerate map",
+    control=function()
+      terrain.origin = {math.random(512), math.random(512)}
+      terrain.seed = os.time()
+      terrain.createMap()
+    end
+  }, {
     key="k",
     description="scale -",
     control=function()
@@ -63,30 +71,30 @@ function love.load()
     end
   }, {
     key="a",
-    description="origin x -",
+    description="offset x -",
     control=function()
-      terrain.origin[1] = terrain.origin[1] - 1
+      terrain.offset[1] = terrain.offset[1] - .1
       terrain.createMap()
     end
   }, {
     key="s",
-    description="origin x +",
+    description="offset x +",
     control=function()
-      terrain.origin[1] = terrain.origin[1] + 1
+      terrain.offset[1] = terrain.offset[1] + .1
       terrain.createMap()
     end
   }, {
     key=",",
     description="persistence -",
     control=function()
-      terrain.persistence = math.max(terrain.persistence - .1, 0)
+      terrain.persistence = math.max(terrain.persistence - .02, 0)
       terrain.createMap()
     end
   }, {
     key=".",
     description="persistence +",
     control=function()
-      terrain.persistence = terrain.persistence + .1
+      terrain.persistence = terrain.persistence + .02
       terrain.createMap()
     end
   }, {
@@ -127,12 +135,12 @@ function love.update(dt)
 end
 
 function love.draw()
+  terrain.draw()
   -- Draw debug text
   if debugText then
     love.graphics.setColor({255, 255, 255})
     love.graphics.print(debugStr, 20, 20)
   end
-  terrain.draw()
 end
 
 function love.keypressed(key, unicode)
