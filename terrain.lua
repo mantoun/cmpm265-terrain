@@ -5,15 +5,17 @@ terrain.map = {width=0, height=0}
 terrain.age = 0
 terrain.width = 256
 terrain.height = 256
-terrain.scale = 2
+terrain.scale = 8
 terrain.octaves = 1
 terrain.persistence = .5
+
+-- TODO: move origin
+-- TODO: not very high contrast... is it hitting the full [0, 1]?
 
 function terrain.createMap()
   local age = terrain.age
   local map = terrain.map
-  local width = terrain.width
-  local height = terrain.height
+  local width, height = terrain.width, terrain.height
   for y=1,height do
     map[y] = {}
     for x=1,width do
@@ -26,13 +28,14 @@ function terrain.createMap()
   --math.randomseed(os.time())
   math.randomseed(123)
 
+  -- The origin in noise space
+  local origin = {math.random(256), math.random(256)}
+
   for octave=1,terrain.octaves do
     -- Scale defines the size of the area in noise space from which to draw
     -- points.
-    local xscale = terrain.scale * octave
+    local xscale = terrain.scale * 2^(octave-1)
     local yscale = xscale / (width / height)  -- Don't squash the map
-    -- The origin in noise space
-    local origin = {math.random(256), math.random(256)}
     local nx, ny = origin[1], origin[2]
     local dx = xscale / width
     local dy = yscale / height
@@ -43,20 +46,29 @@ function terrain.createMap()
         local noise = love.math.noise(nx, ny, age)  -- Returns values on [0, 1]
         noise = noise * 2 - 1                       -- Put value on [-1, 1]
         -- Reduce amplitude per octave
-        local amplitude = terrain.persistence^(octave-1)
-        noise = noise * amplitude
+        noise = noise * terrain.persistence^(octave-1)
         map[y][x] = map[y][x] + noise
         nx = nx + dx
       end
       ny = ny + dy
     end
   end
+
+  -- TODO: rm
+  local min, max = 100, 0
+  for y=1,height do
+    for x=1,width do
+      if map[y][x] < min then min = map[y][x] end
+      if map[y][x] > max then max = map[y][x] end
+    end
+  end
+  print(min, max)
 end
 
 function terrain.draw()
   -- TODO: tile size
   -- TODO: center the map
-  local tilesize = 4
+  local tilesize = 2
   local map = terrain.map
   local xpos, ypos = 0, 0
   for y=1,terrain.height do
