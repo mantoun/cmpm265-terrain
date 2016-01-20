@@ -3,9 +3,9 @@
 local terrain = {}
 terrain.map = {}
 terrain.age = 0
-terrain.width = 256
-terrain.height = 256
-terrain.tilesize = 4
+terrain.width = 128
+terrain.height = 128
+terrain.tilesize = 8
 terrain.scale = 2.5
 terrain.octaves = 6
 terrain.persistence = .5
@@ -25,7 +25,7 @@ function terrain.createMap()
   local map = terrain.map
   local offsetx, offsety = terrain.offset[1], terrain.offset[2]
   local width, height = terrain.width, terrain.height
-  local contrast = 1.75  -- Increase the range of the noise
+  local contrast = 1.5  -- Increase the range of the noise
   for y=1,height do
     map[y] = {}
     for x=1,width do
@@ -46,7 +46,10 @@ function terrain.createMap()
     for y=1,height do
       nx = origin[1]
       for x=1,width do
-        local posx = nx + (offsetx * freq)   -- Sample point includes offset
+        -- Find the point in noise space from which to sample. Include the
+        -- offset so we can move the map. TODO: there's still some very subtle
+        -- changing of values for some points.
+        local posx = nx + (offsetx * freq)
         local posy = ny + (offsety * freq)
         local noise = love.math.noise(posx, posy, age)  -- Returns [0, 1]
         noise = noise * 2 - 1                           -- Put on [-1, 1]
@@ -74,13 +77,13 @@ function terrain.createMap()
 end
 
 function renderMap()
-  canvas = love.graphics.newCanvas()
+  local tilesize = terrain.tilesize
+  local w = terrain.width * tilesize
+  local h = terrain.height * tilesize
+  canvas = love.graphics.newCanvas(w, h)
   love.graphics.setCanvas(canvas)
-  -- TODO: need this? canvas seems to be dark
-  love.graphics.clear()
 
   -- TODO: tile size
-  local tilesize = terrain.tilesize
   local map = terrain.map
   local xpos, ypos = 0, 0
   for y=1,terrain.height do
@@ -104,8 +107,11 @@ function renderMap()
 end
 
 function terrain.draw()
-  -- TODO: center the map
-  love.graphics.draw(canvas)
+  local hwx = love.graphics.getWidth() / 2  -- Half of window width
+  local hwy = love.graphics.getHeight() / 2
+  local hcx = canvas:getWidth() / 2
+  local hcy = canvas:getHeight() / 2
+  love.graphics.draw(canvas, hwx-hcx, hwy-hcy)
 end
 
 return terrain
