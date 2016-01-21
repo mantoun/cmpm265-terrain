@@ -89,7 +89,8 @@ function renderMap()
   local ts = 16  -- the size of the tiles in the terrain map
   local tiles = {}
   tiles.grass = love.graphics.newQuad(16, 16, ts, ts, tx, ty)
-  tiles.dessert = love.graphics.newQuad(64, 16, ts, ts, tx, ty)
+  tiles.sand = love.graphics.newQuad(64, 16, ts, ts, tx, ty)
+  tiles.hill = love.graphics.newQuad(16, 176, ts, ts, tx, ty)
   tiles.snow = love.graphics.newQuad(112, 16, ts, ts, tx, ty)
   tiles.forest = love.graphics.newQuad(64, 176, ts, ts, tx, ty)
   tiles.snowforest = love.graphics.newQuad(112, 176, ts, ts, tx, ty)
@@ -99,16 +100,22 @@ function renderMap()
   -- Scale the 16x16 tiles to terrain.tilesize
   local sx, sy = terrain.tilesize / ts
 
-  local function getTileType(h)
-    -- Given a height value between [0, 1] return a reference to the
-    -- appropriate tileset and quad.
+  local function drawTile(h, x, y, sx, sy)
+    -- Given a height value between [0, 1], a position on screen, and a scale
+    -- factor, draw the appropriate tile.
     -- TODO: accept coords and check neighbors for transitions
     if h < .3 then
-      return water, tiles.water
+      love.graphics.draw(water, tiles.water, x, y, 0, sx, sy)
+    elseif h < .4 then
+      love.graphics.draw(tileset, tiles.sand, x, y, 0, sx, sy)
     elseif h < .6 then
-      return tileset, tiles.grass
+      love.graphics.draw(tileset, tiles.grass, x, y, 0, sx, sy)
+    elseif h < .7 then
+      love.graphics.draw(tileset, tiles.hill, x, y, 0, sx, sy)
+    elseif h < .8 then
+      love.graphics.draw(tileset, tiles.forest, x, y, 0, sx, sy)
     else
-      return tileset, tiles.forest
+      love.graphics.draw(tileset, tiles.snow, x, y, 0, sx, sy)
     end
   end
 
@@ -121,18 +128,7 @@ function renderMap()
       -- Get a height value between 0 and 1
       local height = map[y][x] / 2 + .5
       height = math.min(1, math.max(height, 0))
-      --TODO: rm
-      -- Interpret height as alpha
-      local alpha = height * 255
-      --local color = getColor(height)
-      --local color = {255, 255, 255, alpha}
-      --love.graphics.setColor(color)
-      --love.graphics.rectangle('fill', xpos, ypos, tilesize, tilesize)
-
-      -- TODO: draw water under only under transition tiles
-      --love.graphics.draw(water, tiles.water, xpos, ypos, 0, sx, sy)
-      img, quad = getTileType(height)
-      love.graphics.draw(img, quad, xpos, ypos, 0, sx, sy)
+      drawTile(height, xpos, ypos, sx, sy)
       xpos = xpos + tilesize
     end
     ypos = ypos + tilesize
