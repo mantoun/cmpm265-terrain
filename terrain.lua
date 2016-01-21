@@ -3,9 +3,9 @@
 local terrain = {}
 terrain.map = {}
 terrain.age = 0
-terrain.width = 128
-terrain.height = 128
-terrain.tilesize = 8
+terrain.width = 64
+terrain.height = 64
+terrain.tilesize = 32  -- the apparent tilesize
 terrain.scale = 2.5
 terrain.octaves = 6
 terrain.persistence = .5
@@ -83,22 +83,56 @@ function renderMap()
   canvas = love.graphics.newCanvas(w, h)
   love.graphics.setCanvas(canvas)
 
-  -- TODO: tile size
+  -- Initialize the tileset
+  local tileset = love.graphics.newImage('textures/tileset_1.png')
+  local tx, ty = tileset:getDimensions()
+  local ts = 16  -- the size of the tiles in the terrain map
+  local tiles = {}
+  tiles.grass = love.graphics.newQuad(16, 16, ts, ts, tx, ty)
+  tiles.dessert = love.graphics.newQuad(64, 16, ts, ts, tx, ty)
+  tiles.snow = love.graphics.newQuad(112, 16, ts, ts, tx, ty)
+  tiles.forest = love.graphics.newQuad(64, 176, ts, ts, tx, ty)
+  tiles.snowforest = love.graphics.newQuad(112, 176, ts, ts, tx, ty)
+  local water = love.graphics.newImage('textures/water_1.png')
+  tx, ty = water:getDimensions()
+  tiles.water = love.graphics.newQuad(0, 0, ts, ts, tx, ty)
+  -- Scale the 16x16 tiles to terrain.tilesize
+  local sx, sy = terrain.tilesize / ts
+
+  local function getTileType(h)
+    -- Given a height value between [0, 1] return a reference to the
+    -- appropriate tileset and quad.
+    -- TODO: accept coords and check neighbors for transitions
+    if h < .3 then
+      return water, tiles.water
+    elseif h < .6 then
+      return tileset, tiles.grass
+    else
+      return tileset, tiles.forest
+    end
+  end
+
   local map = terrain.map
   local xpos, ypos = 0, 0
+  local img, quad
   for y=1,terrain.height do
     xpos = 0
     for x=1,terrain.width do
       -- Get a height value between 0 and 1
       local height = map[y][x] / 2 + .5
       height = math.min(1, math.max(height, 0))
+      --TODO: rm
       -- Interpret height as alpha
       local alpha = height * 255
-      --TODO: rm
       --local color = getColor(height)
-      local color = {255, 255, 255, alpha}
-      love.graphics.setColor(color)
-      love.graphics.rectangle('fill', xpos, ypos, tilesize, tilesize)
+      --local color = {255, 255, 255, alpha}
+      --love.graphics.setColor(color)
+      --love.graphics.rectangle('fill', xpos, ypos, tilesize, tilesize)
+
+      -- TODO: draw water under only under transition tiles
+      --love.graphics.draw(water, tiles.water, xpos, ypos, 0, sx, sy)
+      img, quad = getTileType(height)
+      love.graphics.draw(img, quad, xpos, ypos, 0, sx, sy)
       xpos = xpos + tilesize
     end
     ypos = ypos + tilesize
