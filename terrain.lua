@@ -84,51 +84,52 @@ function renderMap()
   love.graphics.setCanvas(canvas)
 
   -- Initialize the tileset
-  local tileset = love.graphics.newImage('textures/tileset_1.png')
-  local tx, ty = tileset:getDimensions()
+  local land = love.graphics.newImage('textures/tileset_1.png')
   local ts = 16  -- the size of the tiles in the terrain map
   local tiles = {}
-  tiles.grass = love.graphics.newQuad(16, 16, ts, ts, tx, ty)
-  tiles.sand = love.graphics.newQuad(64, 16, ts, ts, tx, ty)
-  tiles.hill = love.graphics.newQuad(16, 176, ts, ts, tx, ty)
-  tiles.snow = love.graphics.newQuad(112, 16, ts, ts, tx, ty)
-  tiles.forest = love.graphics.newQuad(64, 176, ts, ts, tx, ty)
-  tiles.snowforest = love.graphics.newQuad(112, 176, ts, ts, tx, ty)
+  local function newQuad(x, y, tileset)
+    local tx, ty = tileset:getDimensions()
+    return love.graphics.newQuad(x*ts, y*ts, ts, ts, tx, ty)
+  end
+  tiles.grass = newQuad(1, 1, land)
+  tiles.sand = newQuad(4, 1, land)
+  tiles.hill = newQuad(1, 11, land)
+  tiles.snow = newQuad(7, 1, land)
+  tiles.forest = newQuad(4, 11, land)
+  tiles.snowforest = newQuad(7, 11, land)
+  -- TODO: maybe just draw water under everything?
   local water = love.graphics.newImage('textures/water_1.png')
-  tx, ty = water:getDimensions()
-  tiles.water = love.graphics.newQuad(0, 0, ts, ts, tx, ty)
+  tiles.water = newQuad(0, 0, water)
+
   -- Scale the 16x16 tiles to terrain.tilesize
   local sx, sy = terrain.tilesize / ts
 
-  local function drawTile(h, x, y, sx, sy)
+  local function drawTile(h, x, y)
     -- Given a height value between [0, 1], a position on screen, and a scale
     -- factor, draw the appropriate tile.
     -- TODO: accept coords and check neighbors for transitions
     if h < .3 then
       love.graphics.draw(water, tiles.water, x, y, 0, sx, sy)
     elseif h < .4 then
-      love.graphics.draw(tileset, tiles.sand, x, y, 0, sx, sy)
+      love.graphics.draw(land, tiles.sand, x, y, 0, sx, sy)
     elseif h < .6 then
-      love.graphics.draw(tileset, tiles.grass, x, y, 0, sx, sy)
-    elseif h < .7 then
-      love.graphics.draw(tileset, tiles.hill, x, y, 0, sx, sy)
+      love.graphics.draw(land, tiles.grass, x, y, 0, sx, sy)
     elseif h < .8 then
-      love.graphics.draw(tileset, tiles.forest, x, y, 0, sx, sy)
+      love.graphics.draw(land, tiles.forest, x, y, 0, sx, sy)
     else
-      love.graphics.draw(tileset, tiles.snow, x, y, 0, sx, sy)
+      love.graphics.draw(land, tiles.snow, x, y, 0, sx, sy)
     end
   end
 
   local map = terrain.map
   local xpos, ypos = 0, 0
-  local img, quad
   for y=1,terrain.height do
     xpos = 0
     for x=1,terrain.width do
       -- Get a height value between 0 and 1
       local height = map[y][x] / 2 + .5
       height = math.min(1, math.max(height, 0))
-      drawTile(height, xpos, ypos, sx, sy)
+      drawTile(height, xpos, ypos)
       xpos = xpos + tilesize
     end
     ypos = ypos + tilesize
