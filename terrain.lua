@@ -14,10 +14,6 @@ terrain.offset = {0, 0}
 
 local canvas = love.graphics.newCanvas()
 
--- TODO: textures -- wood / bumps
--- TODO: octaves layers moving at different speeds when moving origin
--- need to add the increment to each sample point instead of the origin since
--- there are multiplicative effects
 function terrain.createMap()
   math.randomseed(terrain.seed)
   local origin = {math.random(512), math.random(512)}
@@ -34,8 +30,7 @@ function terrain.createMap()
   end
 
   for octave=1,terrain.octaves do
-    -- Scale defines the size of the area in noise space from which to draw
-    -- points.
+    -- Define the size of the area in noise space from which to draw points.
     local freq = 2^(octave-1)
     local xscale = terrain.scale * freq
     local yscale = xscale / (width / height)  -- Don't squash the map
@@ -48,7 +43,7 @@ function terrain.createMap()
       for x=1,width do
         -- Find the point in noise space from which to sample. Include the
         -- offset so we can move the map. TODO: there's still some very subtle
-        -- changing of values for some points.
+        -- changing of values for some points. Converting to and from [-1, 1]?
         local posx = nx + (offsetx * freq)
         local posy = ny + (offsety * freq)
         local noise = love.math.noise(posx, posy, age)  -- Returns [0, 1]
@@ -83,6 +78,8 @@ function renderMap()
   canvas = love.graphics.newCanvas(w, h)
   love.graphics.setCanvas(canvas)
 
+  ---[[
+  -- TODO: tileset in a different package?
   -- Initialize the tileset
   local land = love.graphics.newImage('textures/tileset_1.png')
   local ts = 16  -- the size of the tiles in the terrain map
@@ -92,14 +89,15 @@ function renderMap()
     return love.graphics.newQuad(x*ts, y*ts, ts, ts, tx, ty)
   end
   tiles.grass = newQuad(1, 1, land)
+  tiles.grassSand = newQuad(10, 0, land)  -- Grass north of sand
   tiles.sand = newQuad(4, 1, land)
-  tiles.hill = newQuad(1, 11, land)
   tiles.snow = newQuad(7, 1, land)
   tiles.forest = newQuad(4, 11, land)
-  tiles.snowforest = newQuad(7, 11, land)
+  tiles.mountain = newQuad(10, 16, land)
   -- TODO: maybe just draw water under everything?
   local water = love.graphics.newImage('textures/water_1.png')
   tiles.water = newQuad(0, 0, water)
+  --]]
 
   -- Scale the 16x16 tiles to terrain.tilesize
   local sx, sy = terrain.tilesize / ts
