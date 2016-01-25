@@ -1,11 +1,11 @@
 -- Noise-based terrain generation for Love 0.10.0
--- TODO: biomes
+local tileset = require 'tileset'
 local terrain = {}
 terrain.map = {}
 terrain.age = 0
-terrain.width = 64
-terrain.height = 64
-terrain.tilesize = 32  -- the apparent tilesize
+terrain.width = 32
+terrain.height = 32
+terrain.tilesize = 16  -- the apparent tilesize
 terrain.scale = 2.5
 terrain.octaves = 6
 terrain.persistence = .5
@@ -20,8 +20,10 @@ function terrain.createMap()
   local age = terrain.age
   local map = terrain.map
   local offsetx, offsety = terrain.offset[1], terrain.offset[2]
-  local width, height = terrain.width, terrain.height
+  local width, height = terrain.width+1, terrain.height+1
   local contrast = 1.5  -- Increase the range of the noise
+  -- Instead of sampling a height for each tile, we'll sample the heights at
+  -- the four vertices, so our map structure is a series of corner points.
   for y=1,height do
     map[y] = {}
     for x=1,width do
@@ -72,51 +74,21 @@ function terrain.createMap()
 end
 
 function renderMap()
+  local map = terrain.map
   local tilesize = terrain.tilesize
   local w = terrain.width * tilesize
   local h = terrain.height * tilesize
   canvas = love.graphics.newCanvas(w, h)
   love.graphics.setCanvas(canvas)
 
-  ---[[
-  -- TODO: tileset in a different package?
-  -- Initialize the tileset
-  local land = love.graphics.newImage('textures/tileset_1.png')
-  local ts = 16  -- the size of the tiles in the terrain map
-  local tiles = {}
-  local function newQuad(x, y, tileset)
-    local tx, ty = tileset:getDimensions()
-    return love.graphics.newQuad(x*ts, y*ts, ts, ts, tx, ty)
-  end
-  tiles.grass = newQuad(1, 1, land)
-  tiles.grassSand = newQuad(10, 0, land)  -- Grass north of sand
-  tiles.sand = newQuad(4, 1, land)
-  tiles.snow = newQuad(7, 1, land)
-  tiles.forest = newQuad(4, 11, land)
-  tiles.mountain = newQuad(10, 16, land)
-  -- TODO: maybe just draw water under everything?
-  local water = love.graphics.newImage('textures/water_1.png')
-  tiles.water = newQuad(0, 0, water)
-  --]]
-
   -- Scale the 16x16 tiles to terrain.tilesize
-  local sx, sy = terrain.tilesize / ts
+  local sx, sy = terrain.tilesize / tileset.tilesize
 
-  local function drawTile(h, x, y)
-    -- Given a height value between [0, 1], a position on screen, and a scale
-    -- factor, draw the appropriate tile.
-    -- TODO: accept coords and check neighbors for transitions
-    if h < .3 then
-      love.graphics.draw(water, tiles.water, x, y, 0, sx, sy)
-    elseif h < .4 then
-      love.graphics.draw(land, tiles.sand, x, y, 0, sx, sy)
-    elseif h < .6 then
-      love.graphics.draw(land, tiles.grass, x, y, 0, sx, sy)
-    elseif h < .8 then
-      love.graphics.draw(land, tiles.forest, x, y, 0, sx, sy)
-    else
-      love.graphics.draw(land, tiles.snow, x, y, 0, sx, sy)
-    end
+  local function drawTile(x, y, index, avg)
+    -- Given a position on screen, draw the tile specified by index. If such a
+    -- tile isn't present, use the avg tile height to pick the tile.
+    local tile = tileset.tiles[index] or tileset.tiles[avg]
+    love.graphics.draw(tile[1], tile[2], x, y, 0, sx, sy)
   end
 
   local map = terrain.map
@@ -124,10 +96,7 @@ function renderMap()
   for y=1,terrain.height do
     xpos = 0
     for x=1,terrain.width do
-      -- Get a height value between 0 and 1
-      local height = map[y][x] / 2 + .5
-      height = math.min(1, math.max(height, 0))
-      drawTile(height, xpos, ypos)
+      drawTile(xpos, ypos, getTileIndex(x, y, map))
       xpos = xpos + tilesize
     end
     ypos = ypos + tilesize
