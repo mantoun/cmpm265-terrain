@@ -3,10 +3,10 @@ local tileset = require 'tileset'
 local terrain = {}
 terrain.map = {}
 terrain.age = 0
-terrain.width = 32
-terrain.height = 32
+terrain.width = 64
+terrain.height = 64
 terrain.tilesize = 16  -- the apparent tilesize
-terrain.scale = 2.5
+terrain.scale = 1.5    -- must be smaller for small w and h for good xitions
 terrain.octaves = 6
 terrain.persistence = .5
 terrain.seed = os.time()
@@ -96,6 +96,9 @@ function renderMap()
   for y=1,terrain.height do
     xpos = 0
     for x=1,terrain.width do
+      -- TODO: remove? a hack for tileset: draw grass under everything so we
+      -- can use the transparent tree graphic for forest tiles
+      drawTile(xpos, ypos, 3333)  -- Draw grass under all
       drawTile(xpos, ypos, getTileIndex(x, y, map))
       xpos = xpos + tilesize
     end
