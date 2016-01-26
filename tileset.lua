@@ -45,12 +45,27 @@ end
 
 local sheet = love.graphics.newImage('textures/sheet.png')
 
--- Define base tiles
-tiles[1111] = newTile(4, 7, sheet)
-tiles[2222] = newTile(4, 4, sheet)
-tiles[3333] = newTile(6, 6, sheet)
-tiles[4444] = newTile(17, 11, sheet)
-tiles[5555] = newTile(18, 11, sheet)  -- pink tree
+-- Define base tiles and variants
+tiles[1111] = {newTile(4, 7, sheet)}
+tiles[2222] = {newTile(4, 4, sheet),  -- duplicate the empty tile for
+               newTile(4, 4, sheet),  -- better odds of being chosen
+               newTile(4, 4, sheet),
+               newTile(4, 4, sheet),
+               newTile(4, 4, sheet),
+               newTile(4, 4, sheet),
+               newTile(4, 3, sheet),
+               newTile(4, 2, sheet)}
+tiles[3333] = {newTile(6, 6, sheet),
+               newTile(6, 6, sheet),
+               newTile(6, 6, sheet),
+               newTile(6, 6, sheet),
+               newTile(6, 6, sheet),
+               newTile(6, 6, sheet),
+               newTile(6, 6, sheet),
+               newTile(6, 5, sheet),
+               newTile(6, 0, sheet)}
+tiles[4444] = {newTile(17, 11, sheet)}
+tiles[5555] = {newTile(18, 11, sheet)} -- pink tree
 
 local function generateTransitionTiles(a, b, x, y)
   -- Generate transition tiles given tiletypes a and b and the x, y index in
@@ -60,36 +75,36 @@ local function generateTransitionTiles(a, b, x, y)
   local ur = tonumber(a .. b .. a .. a)
   local lr = tonumber(a .. a .. b .. a)
   local ll = tonumber(a .. a .. a .. b)
-  tiles[ul] = newTile(x+5, y+5, sheet)
-  tiles[ur] = newTile(x, y+5, sheet)
-  tiles[lr] = newTile(x, y, sheet)
-  tiles[ll] = newTile(x+5, y, sheet)
+  tiles[ul] = {newTile(x+5, y+5, sheet)}
+  tiles[ur] = {newTile(x, y+5, sheet)}
+  tiles[lr] = {newTile(x, y, sheet)}
+  tiles[ll] = {newTile(x+5, y, sheet)}
 
   -- Type a in the corners
   ul = tonumber(a .. b .. b .. b)
   ur = tonumber(b .. a .. b .. b)
   lr = tonumber(b .. b .. a .. b)
   ll = tonumber(b .. b .. b .. a)
-  tiles[ul] = newTile(x+2, y+2, sheet)
-  tiles[ur] = newTile(x+1, y+2, sheet)
-  tiles[lr] = newTile(x+1, y+1, sheet)
-  tiles[ll] = newTile(x+2, y+1, sheet)
+  tiles[ul] = {newTile(x+2, y+2, sheet)}
+  tiles[ur] = {newTile(x+1, y+2, sheet)}
+  tiles[lr] = {newTile(x+1, y+1, sheet)}
+  tiles[ll] = {newTile(x+2, y+1, sheet)}
 
   -- Half and Half
   local q = tonumber(b .. a .. a .. b)
   local r = tonumber(a .. b .. b .. a)
   local s = tonumber(a .. a .. b .. b)
   local t = tonumber(b .. b .. a .. a)
-  tiles[q] = newTile(x+5, y+1, sheet)
-  tiles[r] = newTile(x, y+1, sheet)
-  tiles[s] = newTile(x+1, y, sheet)
-  tiles[t] = newTile(x+1, y+5, sheet)
+  tiles[q] = {newTile(x+5, y+1, sheet)}
+  tiles[r] = {newTile(x, y+1, sheet)}
+  tiles[s] = {newTile(x+1, y, sheet)}
+  tiles[t] = {newTile(x+1, y+5, sheet)}
 
   -- Saddles
   q = tonumber(a .. b .. a .. b)
   r = tonumber(b .. a .. b .. a)
-  tiles[q] = newTile(x+1, y+3, sheet)
-  tiles[r] = newTile(x+2, y+3, sheet)
+  tiles[q] = {newTile(x+1, y+3, sheet)}
+  tiles[r] = {newTile(x+2, y+3, sheet)}
 end
 
 generateTransitionTiles(2, 1, 7, 6)  -- Dirt to water transitions

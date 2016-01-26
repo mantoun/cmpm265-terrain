@@ -136,7 +136,7 @@ function love.update(dt)
   if debugText and debugTimer > debugInterval then
     -- TODO: don't need fps
     stats = {
-      ('fps %s'):format(love.timer.getFPS()),
+      --('fps %s'):format(love.timer.getFPS()),
     }
     statsStr = table.concat(stats, '\n')
     -- Regenerate the controls list to reflect current config values

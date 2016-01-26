@@ -91,7 +91,8 @@ function renderMap()
   local function drawTile(x, y, index, avg)
     -- Given a position on screen, draw the tile specified by index. If such a
     -- tile isn't present, use the avg tile height to pick the tile.
-    local tile = tileset.tiles[index] or tileset.tiles[avg]
+    local tiles = tileset.tiles[index] or tileset.tiles[avg]
+    local tile = tiles[math.random(#tiles)]  -- select one of the variants
     love.graphics.draw(tile[1], tile[2], x, y, 0, sx, sy)
   end
 
