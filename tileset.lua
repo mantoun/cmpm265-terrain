@@ -49,11 +49,8 @@ local sheet = love.graphics.newImage('textures/sheet.png')
 tiles[1111] = newTile(4, 7, sheet)
 tiles[2222] = newTile(4, 4, sheet)
 tiles[3333] = newTile(6, 6, sheet)
--- TODO: pick
---tiles[4444] = newTile(6, 2, sheet)
 tiles[4444] = newTile(17, 11, sheet)
---tiles[5555] = newTile(10, 2, sheet)  -- dark dirt or pink tree
-tiles[5555] = newTile(18, 11, sheet)  -- dark dirt or pink tree
+tiles[5555] = newTile(18, 11, sheet)  -- pink tree
 
 local function generateTransitionTiles(a, b, x, y)
   -- Generate transition tiles given tiletypes a and b and the x, y index in

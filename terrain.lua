@@ -6,11 +6,12 @@ terrain.age = 0
 terrain.width = 64
 terrain.height = 64
 terrain.tilesize = 16  -- the apparent tilesize
-terrain.scale = 1.5    -- must be smaller for small w and h for good xitions
+terrain.scale = 1      -- must be smaller for small w and h for good xitions
 terrain.octaves = 6
 terrain.persistence = .5
 terrain.seed = os.time()
 terrain.offset = {0, 0}
+terrain.debug = false
 
 local canvas = love.graphics.newCanvas()
 
@@ -61,15 +62,18 @@ function terrain.createMap()
     end
   end
 
-  -- TODO: rm
-  local min, max = 100, 0
-  for y=1,height do
-    for x=1,width do
-      if map[y][x] < min then min = map[y][x] end
-      if map[y][x] > max then max = map[y][x] end
+  -- Print min and max height values
+  if terrain.debug then
+    local min, max = 100, 0
+    for y=1,height do
+      for x=1,width do
+        if map[y][x] < min then min = map[y][x] end
+        if map[y][x] > max then max = map[y][x] end
+      end
     end
+    print(min, max)
   end
-  print(min, max)
+
   renderMap()
 end
 
