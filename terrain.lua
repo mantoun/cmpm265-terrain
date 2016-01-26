@@ -86,7 +86,7 @@ function renderMap()
   love.graphics.setCanvas(canvas)
 
   -- Scale the 16x16 tiles to terrain.tilesize
-  local sx, sy = terrain.tilesize / tileset.tilesize
+  local sx, sy = tilesize / tileset.tilesize
 
   local function drawTile(x, y, index, avg)
     -- Given a position on screen, draw the tile specified by index. If such a
@@ -100,6 +100,8 @@ function renderMap()
   for y=1,terrain.height do
     xpos = 0
     for x=1,terrain.width do
+      -- TODO: a pass to randomly place alternate tiles
+      -- TODO: a pass to use the 4x4 and 2x2 tree tiles in the forest
       -- TODO: remove? a hack for tileset: draw grass under everything so we
       -- can use the transparent tree graphic for forest tiles
       drawTile(xpos, ypos, 3333)  -- Draw grass under all

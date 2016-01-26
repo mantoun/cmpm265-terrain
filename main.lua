@@ -23,7 +23,7 @@ function love.load()
     control=function() debugText = not debugText end
   }, {
     key="z",
-    description="regenerate map",
+    description="regenerate map\n",
     control=function()
       terrain.origin = {math.random(512), math.random(512)}
       terrain.seed = os.time()
