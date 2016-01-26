@@ -97,28 +97,28 @@ function love.load()
     key="up",
     description="move map",
     control=function()
-      terrain.offset[1] = terrain.offset[1] - .1
+      terrain.offset[2] = terrain.offset[2] - .1
       terrain.createMap()
     end
   }, {
     key="down",
     description="",
     control=function()
-      terrain.offset[1] = terrain.offset[1] + .1
+      terrain.offset[2] = terrain.offset[2] + .1
       terrain.createMap()
     end
   }, {
     key="left",
     description="",
     control=function()
-      terrain.offset[2] = terrain.offset[2] - .1
+      terrain.offset[1] = terrain.offset[1] - .1
       terrain.createMap()
     end
   }, {
     key="right",
     description="\n",
     control=function()
-      terrain.offset[2] = terrain.offset[2] + .1
+      terrain.offset[1] = terrain.offset[1] + .1
       terrain.createMap()
     end
   }, {

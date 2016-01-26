@@ -20,12 +20,11 @@ end
 -- and moving clockwise. Return the average tile type too in case we don't
 -- have an appropriate transition tile.
 -- TODO: these could be part of terrain.lua
--- TODO: should have been map[y][x]...
 function getTileIndex(x, y, map)
-  local ul = getType(map[x][y])
-  local ur = getType(map[x+1][y])
-  local lr = getType(map[x+1][y+1])
-  local ll = getType(map[x][y+1])
+  local ul = getType(map[y][x])
+  local ur = getType(map[y][x+1])
+  local ll = getType(map[y+1][x])
+  local lr = getType(map[y+1][x+1])
   local index = tonumber(ul .. ur .. lr .. ll)
   local avg = (ul + ur + lr + ll) / 4
   avg = math.floor(avg + 0.5)  -- round
